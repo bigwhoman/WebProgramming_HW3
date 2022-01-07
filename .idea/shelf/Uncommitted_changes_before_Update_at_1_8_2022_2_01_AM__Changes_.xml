@@ -1,0 +1,39 @@
+<changelist name="Uncommitted_changes_before_Update_at_1_8_2022_2_01_AM_[Changes]" date="1641594698678" recycled="false" toDelete="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_8_2022_2_01_AM_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Update at 1/8/2022 2:01 AM [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="node_modules/node-sass/vendor/darwin-x64-102/darwin-x64-102_binding.node" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_8_2022_2_01_AM_[Changes]/darwin-x64-102_binding.node" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="node_modules/node-sass/vendor/win32-x64-83/binding.node" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_8_2022_2_01_AM_[Changes]/binding.node" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="node_modules/retry/equation.gif" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_8_2022_2_01_AM_[Changes]/equation.gif" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="node_modules/resolve/test/resolver/symlinked/_/symlink_target/.gitkeep" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_8_2022_2_01_AM_[Changes]/.gitkeep" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="node_modules/unique-filename/coverage/sort-arrow-sprite.png" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_8_2022_2_01_AM_[Changes]/sort-arrow-sprite.png" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="node_modules/node-sass/src/libsass/m4/.gitkeep" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_8_2022_2_01_AM_[Changes]/1.gitkeep" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="node_modules/source-map/lib/mappings.wasm" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_8_2022_2_01_AM_[Changes]/mappings.wasm" />
+  </binary>
+</changelist>
