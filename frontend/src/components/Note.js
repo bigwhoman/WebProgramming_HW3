@@ -6,10 +6,10 @@ function Note({id, text, date, handleDeleteNote}) {
         <div className={'note'}>
             <span>{text}</span>
             <div className={"note-footer"}>
-                <small>{date}</small>
+                <small className={'footer-date'}>{date}</small>
                 <MdDeleteForever
                     className={"delete-icons"}
-                    size={'1.3em'}
+                    size={'2em'}
                     onClick={() => handleDeleteNote(id)}
                 />
             </div>

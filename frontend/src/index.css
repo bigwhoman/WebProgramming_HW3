@@ -13,97 +13,97 @@ code {
 }
 
 .note{
-  background-color:#fef68a;
-  border-radius: 10px;
-  padding: 1rem;
-  min-height: 170px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  white-space: pre-wrap;
+  background-color:#fef68a ;
+  border-radius: 10px  !important;
+  padding: 1rem  !important;
+  min-height: 250px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:space-between !important;
+  white-space: pre-wrap !important;
 }
 
 .note-footer{
-  display: flex;
-  align-items:center;
-  justify-content:space-between;
+  display: flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
 }
 
 .notes-list{
-  display: grid;
-  grid-gap:1rem;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  display: grid !important;
+  grid-gap:1rem !important;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr)) !important;
 }
 
 .container{
-  max-width:960px;
-  margin-right: auto;
-  margin-left: auto;
-  padding-right: 15px;
-  padding-left: 15px;
-  min-height: 100vh;
+  max-width:960px !important;
+  margin-right: auto !important;
+  margin-left: auto !important;
+  padding-right: 15px !important;
+  padding-left: 15px !important;
+  min-height: 100vh !important;
 }
 
 .note.new{
-  /*min-height: 170px;*/
-  /*max-width: 300px;*/
   background-color:#67d7cc;
 }
-textarea{
-  font-size:1rem;
-  border: none;
-  resize:none;
-  background-color:transparent;
+.note textarea{
+  font-size:1rem !important;
+  border: none !important;
+  resize:none !important;
+  background-color:transparent !important;
 }
 
-textarea:focus{
-  outline: none;
+.note textarea:focus{
+  outline: none !important;
 }
 
 .save{
   background-color:#e1e1e1;
-  border:none;
-  border-radius: 15px;
-  padding:5px 10px 5px 10px;
+  border:none  !important;
+  border-radius: 15px  !important;
+  padding:5px 10px 5px 10px  !important;
 }
 
 .save:hover{
   background-color:#ededed;
-  cursor:pointer;
+  cursor:pointer  !important;
 }
 .delete-icons{
-  cursor: pointer;
+  cursor: pointer  !important;
 }
 .delete-icons:hover{
-  transform:scale(1.2);
-  color: #ef0122;
-  /*color:#fff;*/
+  transform:scale(1.2)  !important;
+  color: #ef0122  !important;
+}
+.footer-date{
+  font-size:0.8rem;
 }
 .search{
-  display:flex;
-  align-items:center;
-  background-color:rgb(233,233,233);
-  border-radius: 10px;
-  padding:5px;
-  margin-bottom:1.5em;
+  display:flex  !important;
+  align-items:center  !important;
+  background-color:rgb(233,233,233)  !important;
+  border-radius: 10px  !important;
+  padding:5px  !important;
+  margin-bottom:1.5em  !important;
 }
 .search input{
-  border:none;
-  background-color:transparent;
+  border:none  !important;
+  background-color:transparent  !important;
 }
 .search input:focus{
-  outline:none;
+  outline:none  !important;
 }
 .header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  display:flex  !important;
+  align-items:center  !important;
+  justify-content:space-between  !important;
 }
 
 .dark-mode{
-  background-color:#000;
+  background-color:#000  !important;
 }
 
 .dark-mode h1{
-  color: #fff;
+  color: #fff  !important;
 }

@@ -30,7 +30,7 @@ function AddNote({handleAddNote}) {
 
             </textarea>
             <div className={"note-footer"}>
-                <small>
+                <small className={"footer-date"}>
                     {characterLimit - noteText.length}
                 </small>
                 <button
