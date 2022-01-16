@@ -94,11 +94,6 @@ router.use(function timeLog(req, res, next) {
   next()
 });
 
-// define the Root route
-router.get('/', function (req, res) {
-  res.send('Home page')
-});
-
 router.post('/new', async function (req, res) {
   await Note.sync({alter: true });
   const note = Note.build({ description : req.body.description });
@@ -120,18 +115,33 @@ router.get('/:noteId(\\d+)', async function (req, res) {
   }
 });
 
-router.put('/:noteId(\\d+)', function (req, res) {
+router.put('/:noteId(\\d+)', async function (req, res) {
 
-  res.send(req.params);
+  const note = await Note.findByPk(parseInt(req.params.noteId));
+
+  if (note === null) {
+    res.status(404).json({error: 'Not found'});
+  }else {
+    const new_desc = req.body.description;
+    await note.update({description: new_desc});
+    await note.save();
+    res.status(200).json({id: note.id, description: note.description, status:"updated"});
+  }
 
 });
 
-router.delete('/:noteId(\\d+)', function (req, res) {
+router.delete('/:noteId(\\d+)', async function (req, res) {
 
-  res.send(req.params);
+  const note = await Note.findByPk(parseInt(req.params.noteId));
+
+  if (note === null) {
+    res.status(404).json({error: 'Not found'});
+  }else {
+    await note.destroy({force: false});
+    res.status(200).json({id: note.id , status: "deleted"});
+  }
 
 });
-
 
 app.use('/notes', router);
 
