@@ -1,11 +1,16 @@
 import express from 'express';
-import routers from './routers.js';
-import { Sequelize, Model, DataTypes } from 'sequelize';
+import { Sequelize, Model, DataTypes, Op } from 'sequelize';
 
-const sequelize = new Sequelize('sqlite::memory:');
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: './database.sqlite'
+});
 
 const app = express();
 const port = 3000;
+
+// ----------------------------------------------------------------
+// -------------- MODELS -------------------
 
 /* for testing connection to database
 
@@ -24,7 +29,8 @@ const Note = sequelize.define('Note', {
     type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
+    default: 1
   },
   description: {
     type: DataTypes.STRING,
@@ -40,14 +46,14 @@ const User = sequelize.define('User', {
   id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    primaryKey:true,
+    primaryKey: true,
     autoIncrement: true
   },
   name: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  username:{
+  username: {
     type: DataTypes.STRING,
     allowNull: false
   },
@@ -60,8 +66,10 @@ const User = sequelize.define('User', {
   timestamps: true
 });
 
-await Note.sync({ alter: true });
-await User.sync({ alter: true });
+
+await Note.sync({ alter: true, force: true });
+await User.sync({ alter: true, force: true });
+
 
 /* For Testing Note model in database
 
@@ -70,8 +78,65 @@ await User.sync({ alter: true });
   console.log(note.id);
 */
 
+// ----------------------------------------------------------------
+// -------------- END OF MODELS -------------------
 
-app.use('/notes', routers);
+// ----------------------------------------------------------------
+// -------------- ROUTERS -------------------
+
+app.use(express.json());
+
+var router = express.Router();
+
+// middleware that is specific to this router
+router.use(function timeLog(req, res, next) {
+  console.log('Time: ', Date.now())
+  next()
+});
+
+// define the Root route
+router.get('/', function (req, res) {
+  res.send('Home page')
+});
+
+router.post('/new', async function (req, res) {
+  await Note.sync({alter: true });
+  const note = Note.build({ description : req.body.description });
+  await note.save();
+  // console.log("SAVED SUCCESSFULLY!");
+  // console.log(note.id + " " + note.description);
+});
+
+router.get('/:noteId(\\d+)', async function (req, res) {
+
+  const noteId = req.params.noteId;
+
+  const note = await Note.findByPk(parseInt(noteId));
+
+  if (note === null) {
+    res.status(404).json({error : 'Not found'});
+  } else {
+    res.status(200).json({id: noteId, description: note.description});
+  }
+});
+
+router.put('/:noteId(\\d+)', function (req, res) {
+
+  res.send(req.params);
+
+});
+
+router.delete('/:noteId(\\d+)', function (req, res) {
+
+  res.send(req.params);
+
+});
+
+
+app.use('/notes', router);
+
+// ----------------------------------------------------------------
+// -------------- END OF ROUTERS -------------------
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
