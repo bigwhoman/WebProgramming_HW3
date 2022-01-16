@@ -95,6 +95,10 @@ router.use(function timeLog(req, res, next) {
 });
 
 router.post('/new', async function (req, res) {
+  if (!req.user){
+    res.status(401).json({error: "unAuthorized"});
+  };
+  
   await Note.sync({alter: true });
   const note = Note.build({ description : req.body.description });
   await note.save();
@@ -103,6 +107,9 @@ router.post('/new', async function (req, res) {
 });
 
 router.get('/:noteId(\\d+)', async function (req, res) {
+  if (!req.user){
+    res.status(401).json({error: "unAuthorized"});
+  };
 
   const noteId = req.params.noteId;
 
@@ -116,6 +123,10 @@ router.get('/:noteId(\\d+)', async function (req, res) {
 });
 
 router.put('/:noteId(\\d+)', async function (req, res) {
+
+  if (!req.user){
+    res.status(401).json({error: "unAuthorized"});
+  };
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
@@ -131,6 +142,10 @@ router.put('/:noteId(\\d+)', async function (req, res) {
 });
 
 router.delete('/:noteId(\\d+)', async function (req, res) {
+
+  if (!req.user){
+    res.status(401).json({error: "unAuthorized"});
+  };
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
