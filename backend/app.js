@@ -1,6 +1,10 @@
 import express from 'express';
 import { Sequelize, Model, DataTypes, Op } from 'sequelize';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -86,6 +90,23 @@ await User.sync({ alter: true, force: true });
 // ----------------------------------------------------------------
 // -------------- END OF MODELS -------------------
 
+// -------------- AUTHENTICATION ------------------
+
+function auth (req, res, next) {
+  const token = req.header('auth-token');
+  if (!token) return res.status(401).json({error: 'Access Denied'});
+
+  try{
+    const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+    req.user = verified;
+    next();
+  }catch(err){
+    res.status(400).json({error: 'Invalid Token'});
+  }
+}
+
+// -------------- END OF AUTHENTICATION ------------------
+
 // ----------------------------------------------------------------
 // -------------- ROUTERS -------------------
 
@@ -99,12 +120,7 @@ router.use(function timeLog(req, res, next) {
   next()
 });
 
-router.post('/new', async function (req, res) {
-
-  // if (!req.user) {
-  //   res.status(401).json({ error: "unAuthorized" });
-  // };
-
+router.post('/new', auth, async function (req, res) {
   await Note.sync({ alter: true });
   const note = Note.build({ description: req.body.description });
   await note.save();
@@ -198,12 +214,17 @@ router.post('/register', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
+
   const user = await User.findOne({ where: { username: req.body.username } });
   if (!user) return res.status(404).json({ error: 'invalid username or password' });
-  const passwordIsValid = await bcrypt.compare(req,body.password, user.password);
+  const passwordIsValid = await bcrypt.compare(req.body.password, user.password);
   if (!passwordIsValid) return res.status(400).json({ error: 'invalid username or password' });
 
-  return res.status(200).json({user: user, status: 'logged in'});
+  //create and assign a token
+  const token = jwt.sign({id: user.id}, process.env.TOKEN_SECRET);
+  
+  //send back token in header and in response body for front-end
+  res.header('auth-token', token).send(token);
 });
 
 

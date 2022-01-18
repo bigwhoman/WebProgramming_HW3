@@ -13,7 +13,9 @@
   "dependencies": {
     "@forkjs/group-router": "^1.0.5",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^14.2.0",
     "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
     "sequelize": "^6.13.0"
   },
   "devDependencies": {
