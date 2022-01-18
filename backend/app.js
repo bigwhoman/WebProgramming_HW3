@@ -47,7 +47,8 @@ const User = sequelize.define('User', {
     type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
+    default: 1
   },
   name: {
     type: DataTypes.STRING,
@@ -95,71 +96,100 @@ router.use(function timeLog(req, res, next) {
 });
 
 router.post('/new', async function (req, res) {
-  if (!req.user){
-    res.status(401).json({error: "unAuthorized"});
-  };
-  
-  await Note.sync({alter: true });
-  const note = Note.build({ description : req.body.description });
+
+  // if (!req.user) {
+  //   res.status(401).json({ error: "unAuthorized" });
+  // };
+
+  await Note.sync({ alter: true });
+  const note = Note.build({ description: req.body.description });
   await note.save();
+  res.status(200).send(note);
   // console.log("SAVED SUCCESSFULLY!");
   // console.log(note.id + " " + note.description);
 });
 
 router.get('/:noteId(\\d+)', async function (req, res) {
-  if (!req.user){
-    res.status(401).json({error: "unAuthorized"});
-  };
+
+  // if (!req.user) {
+  //   res.status(401).json({ error: "unAuthorized" });
+  // };
 
   const noteId = req.params.noteId;
 
   const note = await Note.findByPk(parseInt(noteId));
 
   if (note === null) {
-    res.status(404).json({error : 'Not found'});
+    res.status(404).json({ error: 'Not found' });
   } else {
-    res.status(200).json({id: noteId, description: note.description});
+    res.status(200).send(note);
   }
 });
 
 router.put('/:noteId(\\d+)', async function (req, res) {
 
-  if (!req.user){
-    res.status(401).json({error: "unAuthorized"});
-  };
+  // if (!req.user) {
+  //   res.status(401).json({ error: "unAuthorized" });
+  // };
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
   if (note === null) {
-    res.status(404).json({error: 'Not found'});
-  }else {
+    res.status(404).json({ error: 'Not found' });
+  } else {
     const new_desc = req.body.description;
-    await note.update({description: new_desc});
+    await note.update({ description: new_desc });
     await note.save();
-    res.status(200).json({id: note.id, description: note.description, status:"updated"});
+    res.status(200).send(note);
   }
 
 });
 
 router.delete('/:noteId(\\d+)', async function (req, res) {
 
-  if (!req.user){
-    res.status(401).json({error: "unAuthorized"});
-  };
+  // if (!req.user) {
+  //   res.status(401).json({ error: "unAuthorized" });
+  // };
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
   if (note === null) {
-    res.status(404).json({error: 'Not found'});
-  }else {
-    await note.destroy({force: false});
-    res.status(200).json({id: note.id , status: "deleted"});
+    res.status(404).json({ error: 'Not found' });
+  } else {
+    await note.destroy({ force: false });
+    res.status(200).json({ id: note.id, status: "deleted" });
   }
 
 });
 
 app.use('/notes', router);
 
+app.use(express.json());
+
+router.post('/register', async (req, res) => {
+  await User.sync({ alter: true });
+
+  const user = User.build({
+    name: req.body.name,
+    username: req.body.username,
+    password: req.body.password
+  });
+
+  try {
+    await user.save();
+    res.status(200).send(user);
+  }catch(err) {
+    res.status(400).json({error: 'register failed !'});
+  }
+});
+
+router.post('/login', (req, res) => {
+  res.send('logging in ...');
+});
+
+
+
+app.use('/users', router);
 // ----------------------------------------------------------------
 // -------------- END OF ROUTERS -------------------
 
