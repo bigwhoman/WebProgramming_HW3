@@ -197,7 +197,8 @@ router.post('/register', async (req, res) => {
   const user = User.build({
     name: req.body.name,
     username: req.body.username,
-    password: hashPassword
+    password: hashPassword,
+    isAdmin: (req.body.isAdmin)?(req.body.isAdmin) : false
   });
 
   if (await User.findOne({ where: { username: req.body.username } }) !== null) {
@@ -214,8 +215,11 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
 
+  if (req.body.username == null || req.body.password == null) return res.status(404).json({ error: 'username or password can not be empty' });
+
   const user = await User.findOne({ where: { username: req.body.username } });
   if (!user) return res.status(404).json({ error: 'invalid username or password' });
+  
   const passwordIsValid = await bcrypt.compare(req.body.password, user.password);
   if (!passwordIsValid) return res.status(400).json({ error: 'invalid username or password' });
 
