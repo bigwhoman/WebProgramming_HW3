@@ -13,9 +13,8 @@ const sequelize = new Sequelize({
 });
 
 const app = express();
-const port = 3000;
+const port = 8000;
 
-// ----------------------------------------------------------------
 // -------------- MODELS -------------------
 
 /* for testing connection to database
@@ -67,6 +66,11 @@ const User = sequelize.define('User', {
   password: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  isAdmin: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+    default: false
   }
 }, {
   freezeTableName: true,
@@ -75,6 +79,8 @@ const User = sequelize.define('User', {
 
 
 // TODO: for sake of deployment , make {force : false}
+
+Note.belongsTo(User);
 
 await Note.sync({ alter: true, force: true });
 await User.sync({ alter: true, force: true });
@@ -87,27 +93,26 @@ await User.sync({ alter: true, force: true });
   console.log(note.id);
 */
 
-// ----------------------------------------------------------------
 // -------------- END OF MODELS -------------------
 
-// -------------- AUTHENTICATION ------------------
+// -------------- AUTHENTICATION MIDDLEWARE ------------------
 
-function auth (req, res, next) {
+function auth(req, res, next) {
   const token = req.header('auth-token');
-  if (!token) return res.status(401).json({error: 'Access Denied'});
+  if (!token) return res.status(401).json({ error: 'Access Denied' });
 
-  try{
+  try {
     const verified = jwt.verify(token, process.env.TOKEN_SECRET);
     req.user = verified;
     next();
-  }catch(err){
-    res.status(400).json({error: 'Invalid Token'});
+  } catch (err) {
+    res.status(400).json({ error: 'Invalid Token' });
   }
 }
 
-// -------------- END OF AUTHENTICATION ------------------
+// -------------- END OF AUTHENTICATION MIDDLEWARE ------------------
 
-// ----------------------------------------------------------------
+
 // -------------- ROUTERS -------------------
 
 app.use(express.json());
@@ -121,19 +126,14 @@ router.use(function timeLog(req, res, next) {
 });
 
 router.post('/new', auth, async function (req, res) {
-  await Note.sync({ alter: true });
-  const note = Note.build({ description: req.body.description });
+  const note = Note.build({ description: req.body.description, UserId: req.user.id });
   await note.save();
   res.status(200).send(note);
   // console.log("SAVED SUCCESSFULLY!");
   // console.log(note.id + " " + note.description);
 });
 
-router.get('/:noteId(\\d+)', async function (req, res) {
-
-  // if (!req.user) {
-  //   res.status(401).json({ error: "unAuthorized" });
-  // };
+router.get('/:noteId(\\d+)', auth, async function (req, res) {
 
   const noteId = req.params.noteId;
 
@@ -141,21 +141,22 @@ router.get('/:noteId(\\d+)', async function (req, res) {
 
   if (note === null) {
     res.status(404).json({ error: 'Not found' });
+  } else if (req.user.id !== note.UserId && !req.user.isAdmin) {
+    res.status(401).json({ error: 'Access Denied' });
   } else {
     res.status(200).send(note);
   }
+
 });
 
-router.put('/:noteId(\\d+)', async function (req, res) {
-
-  // if (!req.user) {
-  //   res.status(401).json({ error: "unAuthorized" });
-  // };
+router.put('/:noteId(\\d+)', auth, async function (req, res) {
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
   if (note === null) {
     res.status(404).json({ error: 'Not found' });
+  } else if (req.user.id !== note.UserId && !req.user.isAdmin) {
+    res.status(401).json({ error: 'Access Denied' });
   } else {
     const new_desc = req.body.description;
     await note.update({ description: new_desc });
@@ -165,16 +166,14 @@ router.put('/:noteId(\\d+)', async function (req, res) {
 
 });
 
-router.delete('/:noteId(\\d+)', async function (req, res) {
-
-  // if (!req.user) {
-  //   res.status(401).json({ error: "unAuthorized" });
-  // };
+router.delete('/:noteId(\\d+)', auth, async function (req, res) {
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
   if (note === null) {
     res.status(404).json({ error: 'Not found' });
+  } else if (req.user.id !== note.UserId && !req.user.isAdmin) {
+    res.status(401).json({ error: 'Access Denied' });
   } else {
     await note.destroy({ force: false });
     res.status(200).json({ id: note.id, status: "deleted" });
@@ -221,18 +220,17 @@ router.post('/login', async (req, res) => {
   if (!passwordIsValid) return res.status(400).json({ error: 'invalid username or password' });
 
   //create and assign a token
-  const token = jwt.sign({id: user.id}, process.env.TOKEN_SECRET);
-  
+  const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET);
+
   //send back token in header and in response body for front-end
   res.header('auth-token', token).send(token);
 });
 
 
-
 app.use('/users', router);
-// ----------------------------------------------------------------
+
 // -------------- END OF ROUTERS -------------------
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`Server App listening at http://localhost:${port}`)
 });
