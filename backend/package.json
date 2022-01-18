@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@forkjs/group-router": "^1.0.5",
+    "bcryptjs": "^2.4.3",
     "express": "^4.17.2",
     "sequelize": "^6.13.0"
   },

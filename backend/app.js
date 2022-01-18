@@ -1,9 +1,11 @@
 import express from 'express';
 import { Sequelize, Model, DataTypes, Op } from 'sequelize';
+import bcrypt from 'bcryptjs';
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './database.sqlite'
+  storage: './database.sqlite',
+  logging: false // can be changed to true for debbuging!
 });
 
 const app = express();
@@ -67,6 +69,8 @@ const User = sequelize.define('User', {
   timestamps: true
 });
 
+
+// TODO: for sake of deployment , make {force : false}
 
 await Note.sync({ alter: true, force: true });
 await User.sync({ alter: true, force: true });
@@ -167,24 +171,39 @@ app.use('/notes', router);
 app.use(express.json());
 
 router.post('/register', async (req, res) => {
+
   await User.sync({ alter: true });
+
+  //Hash The password
+  const salt = await bcrypt.genSalt(10);
+  const hashPassword = await bcrypt.hash(req.body.password, salt);
+
 
   const user = User.build({
     name: req.body.name,
     username: req.body.username,
-    password: req.body.password
+    password: hashPassword
   });
+
+  if (await User.findOne({ where: { username: req.body.username } }) !== null) {
+    return res.status(400).json({ error: 'user with this username already exists' });
+  }
 
   try {
     await user.save();
     res.status(200).send(user);
-  }catch(err) {
-    res.status(400).json({error: 'register failed !'});
+  } catch (err) {
+    res.status(400).json({ error: 'register failed !' });
   }
 });
 
-router.post('/login', (req, res) => {
-  res.send('logging in ...');
+router.post('/login', async (req, res) => {
+  const user = await User.findOne({ where: { username: req.body.username } });
+  if (!user) return res.status(404).json({ error: 'invalid username or password' });
+  const passwordIsValid = await bcrypt.compare(req,body.password, user.password);
+  if (!passwordIsValid) return res.status(400).json({ error: 'invalid username or password' });
+
+  return res.status(200).json({user: user, status: 'logged in'});
 });
 
 
