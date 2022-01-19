@@ -2,6 +2,7 @@ import express from 'express';
 import { Sequelize, Model, DataTypes, Op } from 'sequelize';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit'
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -95,6 +96,14 @@ await User.sync({ alter: true, force: true });
 
 // -------------- END OF MODELS -------------------
 
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+	max: process.env.RATE_LIMIT_PER_MINUTE, // Limit each IP to n requests per minute
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: 'too many requests per minute'
+});
+
 // -------------- AUTHENTICATION MIDDLEWARE ------------------
 
 function auth(req, res, next) {
@@ -113,8 +122,9 @@ function auth(req, res, next) {
 // -------------- END OF AUTHENTICATION MIDDLEWARE ------------------
 
 
-// -------------- ROUTERS -------------------
 
+// -------------- ROUTERS -------------------
+app.use(limiter);
 app.use(express.json());
 
 var router = express.Router();
@@ -126,6 +136,7 @@ router.use(function timeLog(req, res, next) {
 });
 
 router.post('/new', auth, async function (req, res) {
+
   const note = Note.build({ description: req.body.description, UserId: req.user.id });
   await note.save();
   res.status(200).send(note);
@@ -198,7 +209,7 @@ router.post('/register', async (req, res) => {
     name: req.body.name,
     username: req.body.username,
     password: hashPassword,
-    isAdmin: (req.body.isAdmin)?(req.body.isAdmin) : false
+    isAdmin: (req.body.isAdmin) ? (req.body.isAdmin) : false
   });
 
   if (await User.findOne({ where: { username: req.body.username } }) !== null) {
@@ -219,7 +230,7 @@ router.post('/login', async (req, res) => {
 
   const user = await User.findOne({ where: { username: req.body.username } });
   if (!user) return res.status(404).json({ error: 'invalid username or password' });
-  
+
   const passwordIsValid = await bcrypt.compare(req.body.password, user.password);
   if (!passwordIsValid) return res.status(400).json({ error: 'invalid username or password' });
 
