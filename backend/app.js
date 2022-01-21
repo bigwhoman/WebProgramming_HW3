@@ -124,7 +124,7 @@ function auth(req, res, next) {
 
 
 // -------------- ROUTERS -------------------
-app.use(limiter);
+// app.use(limiter);
 app.use(express.json());
 
 var router = express.Router();
