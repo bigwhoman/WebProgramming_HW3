@@ -10,7 +10,7 @@ function NotesList({notes,handleAddNote,handleDeleteNote}) {
 
                 <Note
                     id={note.id}
-                    text={note.text}
+                    description={note.description}
                     date={note.date}
                     handleDeleteNote={handleDeleteNote}
                 />

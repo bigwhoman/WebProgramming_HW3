@@ -5,7 +5,7 @@ import NotesList from "./NotesList";
 import {nanoid} from "nanoid";
 
 function NotePage({userToken,setToken}) {
-    console.log("----users token----->",userToken)
+    // console.log("----users token----->",userToken)
     const requestOptions = {
         method: 'GET',
         headers: {
@@ -17,64 +17,55 @@ function NotePage({userToken,setToken}) {
     const [searchText, setSearchText] = useState('');
     const [darkMode, setDarkMode] = useState(false);
     let responder = undefined;
-    const savedNotes = undefined;
+    let savedNotes = undefined;
     useEffect(() => {
         fetch('http://localhost:8000/notes/all', requestOptions)
-            .then(response => {
-                console.log("responseeeeeeeee---->>>>     ", response.json())
-                responder = response;
-                return response.json();
-            })
-            .then(data => {
-                if (!responder.ok)
-                    throw new Error(data.error);
-                console.log(data);
+            .then(async response => {
+                savedNotes=(await response.json()).notes;
+                // console.log("saved notes---->",savedNotes);
             })
             .catch(err => {
-                console.log("---error--->", err.message)
-            })
-        if (savedNotes) {
-            setNotes(savedNotes);
-        }
+                // console.log("---error in all notes--->", err.message)
+            }).finally(()=>{
+            if (savedNotes) {
+                setNotes(savedNotes);
+                // console.log("notes---->",notes);
+            }
+        })
     }, []);
-    useEffect(() => {
-        localStorage.setItem(
-            'react-notes-app-data',
-            JSON.stringify(notes)
-        )
-    }, [notes]);
 
-    const addNote = (text) => {
+    const addNote = (description) => {
         const date = new Date();
-        const newNote = {
-            id: nanoid(),
-            text: text,
-            date: date.toLocaleDateString()
-        }
         const op = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'auth-token': userToken
             },
-            body: JSON.stringify({description:text})
+            body: JSON.stringify({description:description})
         };
         fetch('http://localhost:8000/notes/new', op)
-            .then(response => {
-                console.log("note response---->>>>     ", response.json())
+            .then(async response => {
+                console.log("create note response")
                 responder = response;
                 return response.json();
             })
             .then(data => {
                 if (!responder.ok)
                     throw new Error(data.error);
-                console.log(data);
+                console.log('data---->',data);
+
             })
             .catch(err => {
                 console.log("---error--->", err.message)
             })
-        const newNotes = [...notes, newNote];
-        setNotes(newNotes);
+        // const newNote = {
+        //     // id: nanoid(),
+        //     description: description,
+        //     // date: date.toLocaleDateString()
+        // }
+        // const newNotes = [...notes, newNote];
+        // setNotes(newNotes);
     }
 
     const deleteNote = (id) => {
@@ -90,7 +81,7 @@ function NotePage({userToken,setToken}) {
                     <NotesList
                         notes={notes.filter(
                             (note) =>
-                                note.text.toLowerCase().includes(searchText)
+                                note.description.toLowerCase().includes(searchText)
                         )}
                         handleAddNote={addNote}
                         handleDeleteNote={deleteNote}
