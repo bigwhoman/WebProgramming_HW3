@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import fetch from 'node-fetch';
 
 dotenv.config();
 
@@ -16,6 +17,9 @@ const sequelize = new Sequelize({
 const app = express();
 const port = 8000;
 app.use(cors());
+
+// -------------- HANDLING REQUESTS PER MINUTE ---------------------------
+
 var prevIP = null;
 var nextIP = null;
 var tokensLeft = process.env.RATE_LIMIT_PER_MINUTE;
@@ -36,6 +40,8 @@ function changeTokenForIP() {
     tokensLeft--;
   }
 }
+// -------------- END OF HANDLER ---------------------------
+
 
 // -------------- MODELS -------------------
 
@@ -107,6 +113,7 @@ Note.belongsTo(User);
 await Note.sync({ alter: true, force: true });
 await User.sync({ alter: true, force: true });
 
+await fetch('http://localhost:8080/clear', { method: 'DELETE' });
 
 /* For Testing Note model in database
 
@@ -138,6 +145,10 @@ function auth(req, res, next) {
   try {
     const verified = jwt.verify(token, process.env.TOKEN_SECRET);
     req.user = verified;
+    const user = User.findByPk(parseInt(req.user.id));
+    if (user == null || user == undefined) {
+      throw new Error('error');
+    }
     next();
   } catch (err) {
     res.status(400).json({ error: 'Invalid Token' });
@@ -147,13 +158,13 @@ function auth(req, res, next) {
 // -------------- END OF MIDDLEWARES ------------------
 
 
-
 // -------------- ROUTERS -------------------
 app.use(express.json());
 
 var router = express.Router();
 
-// middleware that is specific to this router
+// middleware that is specific to this router for logging time
+
 router.use(function timeLog(req, res, next) {
   console.log('Time: ', Date.now())
   next()
@@ -163,6 +174,12 @@ router.post('/new', requestLimit, auth, async function (req, res) {
 
   const note = Note.build({ description: req.body.description, UserId: req.user.id });
   await note.save();
+
+  const params = new URLSearchParams();
+  params.append('key', parseInt(note.id));
+  params.append('value', note.description);
+  const response = await fetch('http://localhost:8080/add', { method: 'POST', body: params });
+
   res.status(200).send(note);
   // console.log("SAVED SUCCESSFULLY!");
   // console.log(note.id + " " + note.description);
@@ -172,7 +189,16 @@ router.get('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 
   const noteId = req.params.noteId;
 
+  const params = new URLSearchParams();
+  params.append('key', parseInt(noteId));
+  const response = await fetch('http://localhost:8080/get', { method: 'GET', params: params });
+  const data = response.json();
+  const description = data.value;
   const note = await Note.findByPk(parseInt(noteId));
+
+  if (!data.error) {
+    note.description = description;
+  }
 
   if (note === null) {
     res.status(404).json({ error: 'Not found' });
@@ -185,6 +211,11 @@ router.get('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 });
 
 router.put('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
+
+  const params = new URLSearchParams();
+  params.append('key', parseInt(req.params.noteId));
+  params.append('value', req.body.description);
+  await fetch('http://localhost:8080/set', { method: 'PUT', body: params });
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
