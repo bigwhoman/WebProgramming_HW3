@@ -40,6 +40,7 @@ function changeTokenForIP() {
     tokensLeft--;
   }
 }
+
 // -------------- END OF HANDLER ---------------------------
 
 
@@ -113,13 +114,22 @@ Note.belongsTo(User);
 await Note.sync({ alter: true, force: true });
 await User.sync({ alter: true, force: true });
 
-await fetch('http://localhost:8080/clear', { method: 'DELETE' });
+//clear cache 
+try {
+  await fetch('http://localhost:8080/clear', { method: 'DELETE' });
+} catch (e) {
+  console.log("erro while connecting to cache! please run cache server and try again!");
+  process.exit(-1);
+}
+
+//end of cache 
 
 /* For Testing Note model in database
 
   console.log(Note === sequelize.models.Note);
   let note = new Note({id : 1});
   console.log(note.id);
+
 */
 
 // -------------- END OF MODELS -------------------
@@ -147,7 +157,7 @@ function auth(req, res, next) {
     req.user = verified;
     const user = User.findByPk(parseInt(req.user.id));
     if (user == null || user == undefined) {
-      throw new Error('error');
+      res.status(400).json({ error: 'Invalid Token' });
     }
     next();
   } catch (err) {
@@ -175,12 +185,15 @@ router.post('/new', requestLimit, auth, async function (req, res) {
   const note = Note.build({ description: req.body.description, UserId: req.user.id });
   await note.save();
 
+  // send request to cache
   const params = new URLSearchParams();
   params.append('key', parseInt(note.id));
   params.append('value', note.description);
   const response = await fetch('http://localhost:8080/add', { method: 'POST', body: params });
+  // end of cache
 
   res.status(200).send(note);
+
   // console.log("SAVED SUCCESSFULLY!");
   // console.log(note.id + " " + note.description);
 });
@@ -189,16 +202,15 @@ router.get('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 
   const noteId = req.params.noteId;
 
+  // get from cache in a get request
   const params = new URLSearchParams();
   params.append('key', parseInt(noteId));
   const response = await fetch('http://localhost:8080/get', { method: 'GET', params: params });
   const data = response.json();
   const description = data.value;
-  const note = await Note.findByPk(parseInt(noteId));
+  // end of cache 
 
-  if (!data.error) {
-    note.description = description;
-  }
+  const note = await Note.findByPk(parseInt(noteId));
 
   if (note === null) {
     res.status(404).json({ error: 'Not found' });
@@ -212,10 +224,12 @@ router.get('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 
 router.put('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 
+  // PUT request to cache
   const params = new URLSearchParams();
   params.append('key', parseInt(req.params.noteId));
   params.append('value', req.body.description);
   await fetch('http://localhost:8080/set', { method: 'PUT', body: params });
+  // end of cache
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
@@ -229,7 +243,6 @@ router.put('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
     await note.save();
     res.status(200).send(note);
   }
-
 });
 
 router.delete('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
@@ -244,6 +257,16 @@ router.delete('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
     await note.destroy({ force: false });
     res.status(200).json({ id: note.id, status: "deleted" });
   }
+
+});
+
+router.get('/all', requestLimit, auth, async function (req, res) {
+
+  const allNotes = await Note.findAll({
+    where: { UserId: req.user.id }
+  });
+
+  res.status(200).send(allNotes);
 
 });
 
