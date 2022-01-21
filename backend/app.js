@@ -2,9 +2,9 @@ import express from 'express';
 import { Sequelize, Model, DataTypes, Op } from 'sequelize';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import fetch from 'node-fetch';
 
 dotenv.config();
 
@@ -17,6 +17,32 @@ const sequelize = new Sequelize({
 const app = express();
 const port = 8000;
 app.use(cors());
+
+// -------------- HANDLING REQUESTS PER MINUTE ---------------------------
+
+var prevIP = null;
+var nextIP = null;
+var tokensLeft = process.env.RATE_LIMIT_PER_MINUTE;
+
+setInterval(() => {
+  tokensLeft = process.env.RATE_LIMIT_PER_MINUTE;
+}, 60 * 1000);
+
+function changeTokenForIP() {
+  if (prevIP == null) {
+    prevIP = nextIP;
+    tokensLeft--;
+    return;
+  }
+  if (nextIP != prevIP) {
+    tokensLeft = process.env.RATE_LIMIT_PER_MINUTE;
+  } else {
+    tokensLeft--;
+  }
+}
+
+// -------------- END OF HANDLER ---------------------------
+
 
 // -------------- MODELS -------------------
 
@@ -88,25 +114,39 @@ Note.belongsTo(User);
 await Note.sync({ alter: true, force: true });
 await User.sync({ alter: true, force: true });
 
+//clear cache 
+try {
+  await fetch('http://localhost:8080/clear', { method: 'DELETE' });
+} catch (e) {
+  console.log("erro while connecting to cache! please run cache server and try again!");
+  process.exit(-1);
+}
+
+//end of cache 
 
 /* For Testing Note model in database
 
   console.log(Note === sequelize.models.Note);
   let note = new Note({id : 1});
   console.log(note.id);
+
 */
 
 // -------------- END OF MODELS -------------------
 
-const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-	max: process.env.RATE_LIMIT_PER_MINUTE, // Limit each IP to n requests per minute
-	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  message: 'too many requests per minute'
-});
 
-// -------------- AUTHENTICATION MIDDLEWARE ------------------
+// -------------- MIDDLEWARES ------------------
+
+function requestLimit(req, res, next) {
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  nextIP = ip;
+  changeTokenForIP();
+
+  if (tokensLeft < 0) {
+    res.status(429).json({ error: 'Too many request' });
+  }
+  next();
+}
 
 function auth(req, res, next) {
   const token = req.header('auth-token');
@@ -114,6 +154,10 @@ function auth(req, res, next) {
 
   try {
     const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+    const user = User.findByPk(parseInt(req.user.id));
+    if (user == null || user == undefined) {
+      return res.status(400).json({ error: 'Invalid Token' });
+    }
     req.user = verified;
     next();
   } catch (err) {
@@ -121,34 +165,50 @@ function auth(req, res, next) {
   }
 }
 
-// -------------- END OF AUTHENTICATION MIDDLEWARE ------------------
-
+// -------------- END OF MIDDLEWARES ------------------
 
 
 // -------------- ROUTERS -------------------
-// app.use(limiter);
 app.use(express.json());
 
 var router = express.Router();
 
-// middleware that is specific to this router
+// middleware that is specific to this router for logging time
+
 router.use(function timeLog(req, res, next) {
   console.log('Time: ', Date.now())
   next()
 });
 
-router.post('/new', auth, async function (req, res) {
+router.post('/new', requestLimit, auth, async function (req, res) {
 
   const note = Note.build({ description: req.body.description, UserId: req.user.id });
   await note.save();
+
+  // send request to cache
+  const params = new URLSearchParams();
+  params.append('key', parseInt(note.id));
+  params.append('value', note.description);
+  const response = await fetch('http://localhost:8080/add', { method: 'POST', body: params });
+  // end of cache
+
   res.status(200).send(note);
+
   // console.log("SAVED SUCCESSFULLY!");
   // console.log(note.id + " " + note.description);
 });
 
-router.get('/:noteId(\\d+)', auth, async function (req, res) {
+router.get('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 
   const noteId = req.params.noteId;
+
+  // get from cache in a get request
+  const params = new URLSearchParams();
+  params.append('key', parseInt(noteId));
+  const response = await fetch('http://localhost:8080/get', { method: 'GET', params: params });
+  const data = response.json();
+  const description = data.value;
+  // end of cache 
 
   const note = await Note.findByPk(parseInt(noteId));
 
@@ -162,7 +222,14 @@ router.get('/:noteId(\\d+)', auth, async function (req, res) {
 
 });
 
-router.put('/:noteId(\\d+)', auth, async function (req, res) {
+router.put('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
+
+  // PUT request to cache
+  const params = new URLSearchParams();
+  params.append('key', parseInt(req.params.noteId));
+  params.append('value', req.body.description);
+  await fetch('http://localhost:8080/set', { method: 'PUT', body: params });
+  // end of cache
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
@@ -176,10 +243,9 @@ router.put('/:noteId(\\d+)', auth, async function (req, res) {
     await note.save();
     res.status(200).send(note);
   }
-
 });
 
-router.delete('/:noteId(\\d+)', auth, async function (req, res) {
+router.delete('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
@@ -194,11 +260,26 @@ router.delete('/:noteId(\\d+)', auth, async function (req, res) {
 
 });
 
+router.get('/all', requestLimit, auth, async function (req, res) {
+
+  const user = User.findOne({ id: req.user.id });
+
+  if (!user.isAdmin) {
+    const allNotes = await Note.findAll({});
+  } else { // if user is Admin , he/she can see all of notes in database and cache
+    const allNotes = await Note.findAll({
+      where: { UserId: req.user.id }
+    });
+  }
+
+  res.status(200).send(allNotes);
+});
+
 app.use('/notes', router);
 
 app.use(express.json());
 
-router.post('/register', async (req, res) => {
+router.post('/register', requestLimit, async (req, res) => {
 
   await User.sync({ alter: true });
 
@@ -226,7 +307,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', requestLimit, async (req, res) => {
 
   if (req.body.username == null || req.body.password == null) return res.status(404).json({ error: 'username or password can not be empty' });
 
