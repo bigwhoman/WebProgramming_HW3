@@ -154,11 +154,13 @@ function auth(req, res, next) {
 
   try {
     const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+    req.user = verified;
     const user = User.findByPk(parseInt(req.user.id));
     if (user == null || user == undefined) {
+      req.user = undefined;
       return res.status(400).json({ error: 'Invalid Token' });
     }
-    req.user = verified;
+    // req.user = verified;
     next();
   } catch (err) {
     res.status(400).json({ error: 'Invalid Token' });
@@ -263,11 +265,11 @@ router.delete('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 router.get('/all', requestLimit, auth, async function (req, res) {
 
   const user = User.findOne({ id: req.user.id });
-
+  let allNotes = undefined
   if (!user.isAdmin) {
-    const allNotes = await Note.findAll({});
+    allNotes = await Note.findAll({});
   } else { // if user is Admin , he/she can see all of notes in database and cache
-    const allNotes = await Note.findAll({
+    allNotes = await Note.findAll({
       where: { UserId: req.user.id }
     });
   }

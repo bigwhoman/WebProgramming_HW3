@@ -17,6 +17,7 @@ function NotePage({userToken,setToken}) {
     const [searchText, setSearchText] = useState('');
     const [darkMode, setDarkMode] = useState(false);
     let responder = undefined;
+    const savedNotes = undefined;
     useEffect(() => {
         fetch('http://localhost:8000/notes/all', requestOptions)
             .then(response => {
@@ -32,9 +33,6 @@ function NotePage({userToken,setToken}) {
             .catch(err => {
                 console.log("---error--->", err.message)
             })
-        const savedNotes = JSON.parse(
-            localStorage.getItem('react-notes-app-data')
-        );
         if (savedNotes) {
             setNotes(savedNotes);
         }
