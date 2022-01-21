@@ -17,10 +17,13 @@ type pair struct {
 }
 
 type LRUCache interface {
-	Clear()
+	Clear() interface{}
 	GetValue(key interface{}) (interface{}, bool)
 	SetValue(key, value interface{}) (string, bool)
 	Resize(size uint64)
+	Cap() uint64
+	Size() uint64
+
 	Add(key, value interface{}) (string, bool)
 }
 
@@ -30,9 +33,23 @@ type cache struct {
 	keyToItem map[interface{}]*list.Element
 }
 
-func (this *cache) Clear() {
+func (this *cache) Size() uint64 {
+	return uint64(this.list.Len())
+}
+func (this *cache) Cap() uint64 {
+	return this.capacity
+}
+
+func (this *cache) Clear() (err interface{}) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = r
+		}
+		err = nil
+	}()
 	this.keyToItem = make(map[interface{}]*list.Element)
 	this.list.Init()
+	return nil
 }
 
 func (this *cache) GetValue(key interface{}) (interface{}, bool) {

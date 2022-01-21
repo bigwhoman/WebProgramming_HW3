@@ -1,0 +1,31 @@
+syntax = "proto3";
+package cache;
+option go_package = ".";
+service Cache{
+    rpc Add (Request) returns (Response);
+    rpc GetValue (Request) returns (Response);
+    rpc SetValue (Request) returns (Response);
+    rpc Clear (Empty) returns (Response);
+}
+message Response{
+    oneof value{
+        string string_value = 1;
+        int64 int_value = 2;
+    };
+    bool ok = 3;
+}
+
+message Request{
+    oneof key{
+        string string_key = 1;
+        int64 int_key = 2;
+    }
+    oneof value{
+        string string_value = 3;
+        int64 int_value = 4;
+    }
+}
+
+message Empty{
+
+}
