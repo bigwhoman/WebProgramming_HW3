@@ -187,14 +187,18 @@ router.post('/new', requestLimit, auth, async function (req, res) {
   const note = Note.build({ description: req.body.description, UserId: req.user.id });
   await note.save();
 
-  // send request to cache
-  const params = new URLSearchParams();
-  params.append('key', parseInt(note.id));
-  params.append('value', note.description);
-  const response = await fetch('http://localhost:8080/add', { method: 'POST', body: params });
-  // end of cache
+  try {
+    // send request to cache
+    const params = new URLSearchParams();
+    params.append('key', parseInt(note.id));
+    params.append('value', note.description);
+    const response = await fetch('http://localhost:8080/add', { method: 'POST', body: params });
+    // end of cache
 
-  res.status(200).send(note);
+    res.status(200).send(note);
+  } catch (err) {
+    res.status(200).send(note);
+  }
 
   // console.log("SAVED SUCCESSFULLY!");
   // console.log(note.id + " " + note.description);
