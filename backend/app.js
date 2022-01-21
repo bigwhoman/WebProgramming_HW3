@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ const sequelize = new Sequelize({
 
 const app = express();
 const port = 8000;
+app.use(cors());
 
 // -------------- MODELS -------------------
 
@@ -124,7 +126,7 @@ function auth(req, res, next) {
 
 
 // -------------- ROUTERS -------------------
-app.use(limiter);
+// app.use(limiter);
 app.use(express.json());
 
 var router = express.Router();
