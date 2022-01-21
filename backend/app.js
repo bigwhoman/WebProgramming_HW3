@@ -2,7 +2,7 @@ import express from 'express';
 import { Sequelize, Model, DataTypes, Op } from 'sequelize';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import rateLimit from 'express-rate-limit'
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 
 dotenv.config();
