@@ -2,7 +2,6 @@ import express from 'express';
 import { Sequelize, Model, DataTypes, Op } from 'sequelize';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
@@ -17,6 +16,26 @@ const sequelize = new Sequelize({
 const app = express();
 const port = 8000;
 app.use(cors());
+var prevIP = null;
+var nextIP = null;
+var tokensLeft = process.env.RATE_LIMIT_PER_MINUTE;
+
+setInterval(() => {
+  tokensLeft = process.env.RATE_LIMIT_PER_MINUTE;
+}, 60 * 1000);
+
+function changeTokenForIP() {
+  if (prevIP == null) {
+    prevIP = nextIP;
+    tokensLeft--;
+    return;
+  }
+  if (nextIP != prevIP) {
+    tokensLeft = process.env.RATE_LIMIT_PER_MINUTE;
+  } else {
+    tokensLeft--;
+  }
+}
 
 // -------------- MODELS -------------------
 
@@ -98,15 +117,19 @@ await User.sync({ alter: true, force: true });
 
 // -------------- END OF MODELS -------------------
 
-const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-	max: process.env.RATE_LIMIT_PER_MINUTE, // Limit each IP to n requests per minute
-	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  message: 'too many requests per minute'
-});
 
-// -------------- AUTHENTICATION MIDDLEWARE ------------------
+// -------------- MIDDLEWARES ------------------
+
+function requestLimit(req, res, next) {
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  nextIP = ip;
+  changeTokenForIP();
+
+  if (tokensLeft < 0) {
+    res.status(429).json({ error: 'Too many request' });
+  }
+  next();
+}
 
 function auth(req, res, next) {
   const token = req.header('auth-token');
@@ -121,12 +144,11 @@ function auth(req, res, next) {
   }
 }
 
-// -------------- END OF AUTHENTICATION MIDDLEWARE ------------------
+// -------------- END OF MIDDLEWARES ------------------
 
 
 
 // -------------- ROUTERS -------------------
-// app.use(limiter);
 app.use(express.json());
 
 var router = express.Router();
@@ -137,7 +159,7 @@ router.use(function timeLog(req, res, next) {
   next()
 });
 
-router.post('/new', auth, async function (req, res) {
+router.post('/new', requestLimit, auth, async function (req, res) {
 
   const note = Note.build({ description: req.body.description, UserId: req.user.id });
   await note.save();
@@ -146,7 +168,7 @@ router.post('/new', auth, async function (req, res) {
   // console.log(note.id + " " + note.description);
 });
 
-router.get('/:noteId(\\d+)', auth, async function (req, res) {
+router.get('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 
   const noteId = req.params.noteId;
 
@@ -162,7 +184,7 @@ router.get('/:noteId(\\d+)', auth, async function (req, res) {
 
 });
 
-router.put('/:noteId(\\d+)', auth, async function (req, res) {
+router.put('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
@@ -179,7 +201,7 @@ router.put('/:noteId(\\d+)', auth, async function (req, res) {
 
 });
 
-router.delete('/:noteId(\\d+)', auth, async function (req, res) {
+router.delete('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
 
@@ -198,7 +220,7 @@ app.use('/notes', router);
 
 app.use(express.json());
 
-router.post('/register', async (req, res) => {
+router.post('/register', requestLimit, async (req, res) => {
 
   await User.sync({ alter: true });
 
@@ -226,7 +248,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', requestLimit, async (req, res) => {
 
   if (req.body.username == null || req.body.password == null) return res.status(404).json({ error: 'username or password can not be empty' });
 
