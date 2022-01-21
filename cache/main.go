@@ -60,7 +60,7 @@ func getHandler(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": value})
 			return
 		}
-		c.JSON(http.StatusOK, value)
+		c.JSON(http.StatusOK, gin.H{"value": value})
 	}(c.Query("key"))
 }
 func clear(c *gin.Context) {
