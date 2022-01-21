@@ -64,11 +64,15 @@ func (this *cache) GetValue(key interface{}) (interface{}, bool) {
 
 func (this *cache) SetValue(key, value interface{}) (string, bool) {
 	if element, ok := this.keyToItem[key]; ok {
-		this.list.Remove(element)
-		p := element.Value.(*pair)
-		p.value = value
-		this.list.PushFront(element)
-		return "", ok
+		if _, err := checkLength("t", value); err {
+			this.list.Remove(element)
+			p := element.Value.(*pair)
+			p.value = value
+			this.list.PushFront(element)
+			return "", ok
+		} else {
+			return ValueTooLong, false
+		}
 	} else {
 		return KeyNotFound, false
 	}
