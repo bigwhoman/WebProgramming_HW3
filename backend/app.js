@@ -274,7 +274,7 @@ router.get('/all', requestLimit, auth, async function (req, res) {
     });
   }
 
-  res.status(200).send(allNotes);
+  res.status(200).json({ 'notes': allNotes });
 });
 
 app.use('/notes', router);
