@@ -22,10 +22,10 @@ function NotePage({userToken,setToken}) {
         fetch('http://localhost:8000/notes/all', requestOptions)
             .then(async response => {
                 savedNotes=(await response.json()).notes;
-                // console.log("saved notes---->",savedNotes);
+                console.log("saved notes---->",savedNotes);
             })
             .catch(err => {
-                // console.log("---error in all notes--->", err.message)
+                console.log("---error in all notes--->", err.message)
             }).finally(()=>{
             if (savedNotes) {
                 setNotes(savedNotes);
@@ -34,7 +34,8 @@ function NotePage({userToken,setToken}) {
         })
     }, []);
 
-    const addNote = (description) => {
+    const addNote = (text) => {
+        let newNote = undefined;
         const date = new Date();
         const op = {
             method: 'POST',
@@ -42,41 +43,41 @@ function NotePage({userToken,setToken}) {
                 'Content-Type': 'application/json',
                 'auth-token': userToken
             },
-            body: JSON.stringify({description:description})
+            body: JSON.stringify({description:text})
         };
         fetch('http://localhost:8000/notes/new', op)
             .then(async response => {
-                console.log("create note response")
-                responder = response;
+                responder = await response;
                 return response.json();
             })
             .then(data => {
                 if (!responder.ok)
                     throw new Error(data.error);
-                console.log('data---->',data);
-
+                console.log('data---->', data);
             })
             .catch(err => {
                 console.log("---error--->", err.message)
             })
-        // const newNote = {
-        //     // id: nanoid(),
-        //     description: description,
-        //     // date: date.toLocaleDateString()
-        // }
-        // const newNotes = [...notes, newNote];
-        // setNotes(newNotes);
+        newNote = {
+            // id: data.id,
+            description: text,
+            // date:data.updatedAt
+        }
+        console.log("new note--->",newNote);
+        const newNotes = [...notes, newNote];
+        setNotes(newNotes);
     }
 
     const deleteNote = (id) => {
         const newNotes = notes.filter((note) => note.id !== id);
         setNotes(newNotes);
     }
+
     return (
         <>
             <div className={`${darkMode && 'dark-mode'}`}>
                 <div className={"container"}>
-                    <Header handleDarkMode={setDarkMode} setToken={setToken}/>
+                    <Header handleDarkMode={setDarkMode} setToken={setToken} setNotes={notes}/>
                     <Search handleSearchNote={setSearchText}/>
                     <NotesList
                         notes={notes.filter(

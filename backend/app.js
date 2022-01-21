@@ -261,6 +261,7 @@ router.delete('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
     res.status(401).json({ error: 'Access Denied' });
   } else {
     await note.destroy({ force: false });
+
     res.status(200).json({ id: note.id, status: "deleted" });
   }
 
