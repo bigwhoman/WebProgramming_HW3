@@ -22,10 +22,8 @@ function LoginPage({userToken}) {
         let responder = undefined;
         fetch('http://localhost:8000/users/login', requestOptions)
             .then(response => {
-                console.log("json response",response.text())
-                message.loading({content: 'logging in...', key});
                 responder = response;
-                return response.text()
+                return response.json
             })
             .then(data => {
                 if (!responder.ok){

@@ -1,16 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="cce2bdac-470c-408b-8c0d-bdf9548b510f" name="Changes" comment="alpha register and login">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/database.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/backend/database.sqlite" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/cache/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.js" afterDir="false" />
+    <list default="true" id="cce2bdac-470c-408b-8c0d-bdf9548b510f" name="Changes" comment="token and connect back to front">
       <change beforePath="$PROJECT_DIR$/frontend/src/components/LoginPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/LoginPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/ProtectedRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ProtectedRoutes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/RegisterPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/RegisterPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,7 +107,7 @@
       <workItem from="1642267638461" duration="633000" />
       <workItem from="1642714785031" duration="3196000" />
       <workItem from="1642750909301" duration="1963000" />
-      <workItem from="1642752905379" duration="14294000" />
+      <workItem from="1642752905379" duration="14604000" />
     </task>
     <task id="LOCAL-00001" summary="the notes system">
       <created>1641512552443</created>
@@ -159,7 +151,14 @@
       <option name="project" value="LOCAL" />
       <updated>1642783505115</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="token and connect back to front">
+      <created>1642791388988</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1642791388988</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -180,6 +179,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="the notes system" />
     <MESSAGE value="alpha register and login" />
-    <option name="LAST_COMMIT_MESSAGE" value="alpha register and login" />
+    <MESSAGE value="token and connect back to front" />
+    <option name="LAST_COMMIT_MESSAGE" value="token and connect back to front" />
   </component>
 </project>
