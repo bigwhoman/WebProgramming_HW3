@@ -321,7 +321,7 @@ router.post('/login', requestLimit, async (req, res) => {
   const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET);
 
   //send back token in header and in response body for front-end
-  res.header('auth-token', token).send(token);
+  res.header('auth-token', token).json({ 'auth-token': token });
 });
 
 
