@@ -15,7 +15,7 @@ const App = () => {
                     <Route path="/notes" element={<NotePage userToken={token}/>}/>
                 </Route>
                <Route path="/" element={<LoginPage userToken={token}/>}/>
-               <Route path="/register" element={<RegisterPage userToken={token}/>}/>
+               <Route path="/register" element={<RegisterPage/>}/>
                <Route path="*" element={<NotFound/>}/>
             </Routes>
         </Router>

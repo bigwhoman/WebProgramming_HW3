@@ -1,33 +1,40 @@
 import React, {useEffect, useState} from 'react';
-import {Link, useNavigate} from "react-router-dom";
-import {Alert, Button, Card, Form, Spin, Input} from "antd";
+import {Link, Navigate, useNavigate} from "react-router-dom";
+import {Alert, Button, Card, Form, Spin, Input, message} from "antd";
 import Checkbox from "antd/es/checkbox/Checkbox";
 
-function LoginPage() {
+function LoginPage({userToken}) {
     const navigate = useNavigate();
     const [error, setError] = useState(undefined);
     const [progress, updateProgress] = useState(false);
     const onFinish = async (values) => {
         const {username, password} = values;
+        const key = 'updatable';
+
         updateProgress(true)
-        const token = undefined;
         const requestOptions = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify({username: `${username}`, password: `${password}`})
         };
         let responder = undefined;
         fetch('http://localhost:8000/users/login', requestOptions)
             .then(response => {
+                console.log("json response",response.text())
+                message.loading({content: 'logging in...', key});
                 responder = response;
-                return response.json()
+                return response.text()
             })
             .then(data => {
-                if (!responder.ok)
+                if (!responder.ok){
                     throw new Error(data.error);
+                }
+                console.log("-------good data---->",data)
+                setTimeout(() => {
+                    message.success({content: 'logged in successfully', key, duration: 2});
+                }, 1000);
 
             })
             .catch(err => {

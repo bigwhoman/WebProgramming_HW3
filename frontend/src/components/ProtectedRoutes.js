@@ -8,8 +8,8 @@ const useAuth = ({token}) => {
     return loggedIn;
 }
 
-function ProtectedRoutes() {
-    const isAuth = useAuth();
+function ProtectedRoutes(userToken) {
+    const isAuth = useAuth(userToken);
     return isAuth ? <Outlet/> : <Navigate to={"*"}/>
 }
 
