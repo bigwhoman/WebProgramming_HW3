@@ -23,17 +23,19 @@ function LoginPage({userToken}) {
         fetch('http://localhost:8000/users/login', requestOptions)
             .then(response => {
                 responder = response;
-                return response.json
+                return response.json()
             })
             .then(data => {
-                if (!responder.ok){
+                if (!responder.ok) {
                     throw new Error(data.error);
                 }
-                console.log("-------good data---->",data)
+                userToken(data['auth-token']);
                 setTimeout(() => {
                     message.success({content: 'logged in successfully', key, duration: 2});
+                }, 200);
+                setTimeout(() => {
+                    navigate("/notes");
                 }, 1000);
-
             })
             .catch(err => {
                 setVisible(true)

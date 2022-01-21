@@ -5,16 +5,16 @@ import RegisterPage from "./components/RegisterPage";
 import NotFound from "./components/NotFound";
 import 'antd/dist/antd.css'
 import ProtectedRoutes from "./components/ProtectedRoutes";
-
+import {useState} from "react";
 const App = () => {
-    let token = undefined;
+    const [token, setToken] = useState(undefined);
     return (
         <Router>
             <Routes>
                 <Route element={<ProtectedRoutes userToken={token}/>}>
-                    <Route path="/notes" element={<NotePage userToken={token}/>}/>
+                    <Route path="/notes" element={<NotePage userToken={token} setToken={setToken}/>}/>
                 </Route>
-               <Route path="/" element={<LoginPage userToken={token}/>}/>
+               <Route path="/" element={<LoginPage userToken={setToken}/>}/>
                <Route path="/register" element={<RegisterPage/>}/>
                <Route path="*" element={<NotFound/>}/>
             </Routes>
