@@ -74,12 +74,12 @@ function RegisterPage() {
                         initialValues={{
                             remember: true,
                         }}
+
                         onFinish={onFinish}
                         onFinishFailed={onFinishFailed}
                         autoComplete="off"
                     >
                         <Form.Item
-                            className={"form-style"}
                             label="name"
                             name="name"
                             rules={[
@@ -89,12 +89,11 @@ function RegisterPage() {
                                 },
                             ]}
                         >
-                            <Input className={"form-input"}
+                            <Input
                                 placeholder={'name'}
                             />
                         </Form.Item>
                         <Form.Item
-                            className={"form-style"}
                             label="Username"
                             name="username"
                             rules={[
@@ -110,7 +109,6 @@ function RegisterPage() {
                         </Form.Item>
 
                         <Form.Item
-                            className={"form-style"}
                             label="Password"
                             name="password"
                             rules={[

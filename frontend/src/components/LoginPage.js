@@ -65,7 +65,7 @@ function LoginPage({userToken}) {
                         <Alert message={error} type="fail" closable afterClose={handleClose} style={{text: 'white'}}/>
                     ) : null}
                 </div>
-                <Card title="login page" style={{width: 300}}>
+                <Card title="login page" className={"log"} style={{width: 500}}>
 
                     <Form
                         name="basic"
