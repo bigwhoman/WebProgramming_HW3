@@ -268,12 +268,12 @@ router.delete('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 });
 
 router.get('/all', requestLimit, auth, async function (req, res) {
-
   const user = User.findOne({ id: req.user.id });
+
   let allNotes = undefined
-  if (!user.isAdmin) {
+  if (user.isAdmin) {
     allNotes = await Note.findAll({});
-  } else { // if user is Admin , he/she can see all of notes in database and cache
+  } else { // if user is not Admin , he/she can see all of notes in database and cache
     allNotes = await Note.findAll({
       where: { UserId: req.user.id }
     });
