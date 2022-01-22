@@ -126,12 +126,16 @@ try {
 
 // create an adminstrator account
 
-User.build({
-  name: "adminstrator",
-  username: "admin",
-  password: "admin",
-  isAdmin: true
-});
+var admin = User.findOne({ where: { username: 'admin' } });
+if (!admin) {
+  admin = User.build({
+    name: "adminstrator",
+    username: "admin",
+    password: "admin",
+    isAdmin: true
+  });
+  admin.save();
+}
 
 /* For Testing Note model in database
 
