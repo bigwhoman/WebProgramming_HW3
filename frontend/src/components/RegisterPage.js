@@ -46,7 +46,6 @@ function RegisterPage() {
     };
 
     const onFinishFailed = (errorInfo) => {
-        // console.log('Failed:', errorInfo);
     };
 
     const [visible, setVisible] = useState(false);
@@ -54,18 +53,15 @@ function RegisterPage() {
     const handleClose = () => {
         setVisible(false);
     };
-    const myStyle = {
-        background: "-webkit-linear-gradient(to right, #b6fbff, #83a4d4)", /* Chrome 10-25, Safari 5.1-6 */
-    }
     return (
-        <div style={myStyle}>
+        <div>
             <center>
                 <div style={{backgroundColor: 'red', marginBottom: 20, fontWeight: 'bold'}}>
                     {visible ? (
                         <Alert message={error} type="fail" closable afterClose={handleClose} style={{text: 'white'}}/>
                     ) : null}
                 </div>
-                <Card title="register page" style={{width: 300}}>
+                <Card title="register page" className={"gradient"}  style={{width: 600}}>
 
                     <Form
                         name="basic"
@@ -83,6 +79,7 @@ function RegisterPage() {
                         autoComplete="off"
                     >
                         <Form.Item
+                            className={"form-style"}
                             label="name"
                             name="name"
                             rules={[
@@ -92,11 +89,12 @@ function RegisterPage() {
                                 },
                             ]}
                         >
-                            <Input
+                            <Input className={"form-input"}
                                 placeholder={'name'}
                             />
                         </Form.Item>
                         <Form.Item
+                            className={"form-style"}
                             label="Username"
                             name="username"
                             rules={[
@@ -112,6 +110,7 @@ function RegisterPage() {
                         </Form.Item>
 
                         <Form.Item
+                            className={"form-style"}
                             label="Password"
                             name="password"
                             rules={[
@@ -123,18 +122,6 @@ function RegisterPage() {
                         >
                             <Input.Password placeholder={"password"}/>
                         </Form.Item>
-                        {/*<Form.Item*/}
-                        {/*    label="Password Confirmation"*/}
-                        {/*    name="Password Confirmation"*/}
-                        {/*    rules={[*/}
-                        {/*        {*/}
-                        {/*            required: true,*/}
-                        {/*            message: 'Please confirm your password!',*/}
-                        {/*        },*/}
-                        {/*    ]}*/}
-                        {/*>*/}
-                        {/*    <Input.Password placeholder={"password confirmation"}/>*/}
-                        {/*</Form.Item>*/}
 
                         <Form.Item
                             wrapperCol={{

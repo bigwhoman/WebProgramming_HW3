@@ -3,6 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="cce2bdac-470c-408b-8c0d-bdf9548b510f" name="Changes" comment="notes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/database.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/backend/database.sqlite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Note.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Note.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/NotePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/NotePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/RegisterPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/RegisterPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +53,7 @@
       <recent name="G:\Sharif\term3\web\WebProgramming_HW3\backend" />
     </key>
   </component>
-  <component name="RunManager" selected="Shell Script.cache">
+  <component name="RunManager" selected="npm.run">
     <configuration name="cache" type="ShConfigurationType" singleton="false">
       <option name="SCRIPT_TEXT" value="go run main.go" />
       <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
@@ -108,6 +113,7 @@
       <workItem from="1642714785031" duration="3196000" />
       <workItem from="1642750909301" duration="1963000" />
       <workItem from="1642752905379" duration="28917000" />
+      <workItem from="1642867162718" duration="3580000" />
     </task>
     <task id="LOCAL-00001" summary="the notes system">
       <created>1641512552443</created>
@@ -193,7 +199,14 @@
       <option name="project" value="LOCAL" />
       <updated>1642805605652</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="notes">
+      <created>1642867171262</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1642867171262</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

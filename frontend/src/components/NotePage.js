@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Header from "./Header";
 import Search from "./Search";
 import NotesList from "./NotesList";
-import { nanoid } from "nanoid";
 
 function NotePage({ userToken, setToken }) {
-    // console.log("----users token----->",userToken)
     const requestOptions = {
         method: 'GET',
         headers: {
@@ -22,21 +20,17 @@ function NotePage({ userToken, setToken }) {
         fetch('http://localhost:8000/notes/all', requestOptions)
             .then(async response => {
                 savedNotes = (await response.json()).notes;
-                console.log("saved notes---->", savedNotes);
             })
             .catch(err => {
-                console.log("---error in all notes--->", err.message)
             }).finally(() => {
                 if (savedNotes) {
                     setNotes(savedNotes);
-                    // console.log("notes---->",notes);
                 }
             })
     }, []);
 
     const addNote = async (text) => {
         let newNote = undefined;
-        // const date = new Date();
         let date = null;
         let id = null;
 
@@ -58,7 +52,6 @@ function NotePage({ userToken, setToken }) {
                     throw new Error(data.error);
                 date = data.createdAt;
                 id = data.id;
-                console.log('data---->', data);
             })
             .catch(err => {
                 console.log("---error--->", err.message)
@@ -70,7 +63,6 @@ function NotePage({ userToken, setToken }) {
             date: date
         }
 
-        console.log("new note--->", newNote);
         const newNotes = [...notes, newNote];
         setNotes(newNotes);
     }
@@ -89,7 +81,6 @@ function NotePage({ userToken, setToken }) {
             .then(data => {
                 if (!responder.ok)
                     throw new Error(data.error);
-                console.log('data---->', data);
             });
 
         const newNotes = notes.filter((note) => note.id !== id);
