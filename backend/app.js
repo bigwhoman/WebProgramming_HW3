@@ -254,7 +254,6 @@ router.put('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 router.delete('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
-
   if (note === null) {
     res.status(404).json({ error: 'Not found' });
   } else if (req.user.id !== note.UserId && !req.user.isAdmin) {
