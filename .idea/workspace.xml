@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="cce2bdac-470c-408b-8c0d-bdf9548b510f" name="Changes" comment="note tokens">
+    <list default="true" id="cce2bdac-470c-408b-8c0d-bdf9548b510f" name="Changes" comment="notes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/database.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/backend/database.sqlite" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Header.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Note.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Note.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/NotePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/NotePage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/NotesList.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/NotesList.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,7 +107,7 @@
       <workItem from="1642267638461" duration="633000" />
       <workItem from="1642714785031" duration="3196000" />
       <workItem from="1642750909301" duration="1963000" />
-      <workItem from="1642752905379" duration="28022000" />
+      <workItem from="1642752905379" duration="28917000" />
     </task>
     <task id="LOCAL-00001" summary="the notes system">
       <created>1641512552443</created>
@@ -192,7 +186,14 @@
       <option name="project" value="LOCAL" />
       <updated>1642803851456</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="notes">
+      <created>1642805605652</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1642805605652</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -215,6 +216,7 @@
     <MESSAGE value="alpha register and login" />
     <MESSAGE value="token and connect back to front" />
     <MESSAGE value="note tokens" />
-    <option name="LAST_COMMIT_MESSAGE" value="note tokens" />
+    <MESSAGE value="notes" />
+    <option name="LAST_COMMIT_MESSAGE" value="notes" />
   </component>
 </project>
