@@ -107,22 +107,35 @@ const User = sequelize.define('User', {
 });
 
 
-// TODO: for sake of deployment , make {force : false}
+// TODO: for sake of testing , make {force : true}
 
 Note.belongsTo(User);
 
-await Note.sync({ alter: true, force: true });
-await User.sync({ alter: true, force: true });
+await Note.sync({ alter: true, force: false });
+await User.sync({ alter: true, force: false });
 
 //clear cache 
 try {
   await fetch('http://localhost:8080/clear', { method: 'DELETE' });
 } catch (e) {
-  console.log("erro while connecting to cache! please run cache server and try again!");
+  console.log("error while connecting to cache! please run cache server and try again!");
   process.exit(-1);
 }
 
 //end of cache 
+
+// create an adminstrator account
+
+var admin = User.findOne({ where: { username: 'admin' } });
+if (!admin) {
+  admin = User.build({
+    name: "adminstrator",
+    username: "admin",
+    password: "admin",
+    isAdmin: true
+  });
+  admin.save();
+}
 
 /* For Testing Note model in database
 
@@ -254,7 +267,6 @@ router.put('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 router.delete('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 
   const note = await Note.findByPk(parseInt(req.params.noteId));
-
   if (note === null) {
     res.status(404).json({ error: 'Not found' });
   } else if (req.user.id !== note.UserId && !req.user.isAdmin) {
@@ -268,12 +280,12 @@ router.delete('/:noteId(\\d+)', requestLimit, auth, async function (req, res) {
 });
 
 router.get('/all', requestLimit, auth, async function (req, res) {
-
   const user = User.findOne({ id: req.user.id });
+
   let allNotes = undefined
-  if (!user.isAdmin) {
+  if (user.isAdmin) {
     allNotes = await Note.findAll({});
-  } else { // if user is Admin , he/she can see all of notes in database and cache
+  } else { // if user is not Admin , he/she can see all of notes in database and cache
     allNotes = await Note.findAll({
       where: { UserId: req.user.id }
     });
