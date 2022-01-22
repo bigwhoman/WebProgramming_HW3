@@ -107,22 +107,31 @@ const User = sequelize.define('User', {
 });
 
 
-// TODO: for sake of deployment , make {force : false}
+// TODO: for sake of testing , make {force : true}
 
 Note.belongsTo(User);
 
-await Note.sync({ alter: true, force: true });
-await User.sync({ alter: true, force: true });
+await Note.sync({ alter: true, force: false });
+await User.sync({ alter: true, force: false });
 
 //clear cache 
 try {
   await fetch('http://localhost:8080/clear', { method: 'DELETE' });
 } catch (e) {
-  console.log("erro while connecting to cache! please run cache server and try again!");
+  console.log("error while connecting to cache! please run cache server and try again!");
   process.exit(-1);
 }
 
 //end of cache 
+
+// create an adminstrator account
+
+User.build({
+  name: "adminstrator",
+  username: "admin",
+  password: "admin",
+  isAdmin: true
+});
 
 /* For Testing Note model in database
 
